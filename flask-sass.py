@@ -6,9 +6,9 @@ from imaginary_app import app
 from imaginary_app.settings import STATIC_PATH, SASS_PATH # Add these to your settings
 
 # Helper
-def scss(data):
-    sass = Popen([SASS_PATH, '--trace', '--scss', '--stdin'],
-                 stdin=PIPE, stdout=PIPE, stderr=PIPE)
+def scss(data, load_path):
+    args = ['--trace', '--scss', '--stdin', '-I', load_path]
+    sass = Popen([SASS_PATH] + args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
     sass.stdin.write(data)
     sass.stdin.flush()
     sass.stdin.close()
@@ -25,13 +25,14 @@ def scss(data):
 # Sample route
 @app.route('/static/css/<name>.css')
 def css(name):
-    scss_path = os.path.join(STATIC_PATH, 'css/%s.scss' % name)
+    dir_path = os.path.join(STATIC_PATH, 'css')
+    scss_path = os.path.join(dir_path, '%s.scss' % name)
 
     if not os.path.exists(scss_path):
         return abort(404)
 
     with open(scss_path) as fd:
-        success, body = scss(fd.read())
+        success, body = scss(fd.read(), dir_path)
 
     if success:
         return Response(body, status=200, content_type='text/css')
