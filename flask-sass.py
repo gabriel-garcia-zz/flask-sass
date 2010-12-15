@@ -1,6 +1,6 @@
 import os.path
 from subprocess import Popen, PIPE
-from flask import abort
+from flask import Response, abort
 
 from imaginary_app import app
 from imaginary_app.settings import STATIC_PATH, SASS_PATH # Add these to your settings
@@ -33,4 +33,8 @@ def css(name):
     with open(scss_path) as fd:
         success, body = scss(fd.read())
 
-    return body if success else abort(500, '<pre>%s</pre>' % body)
+    if success:
+        return Response(body, status=200, content_type='text/css')
+    else:
+        return Response('<pre>%s</pre>', status=500, content_type='text/html')
+
