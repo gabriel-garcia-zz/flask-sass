@@ -37,5 +37,5 @@ def css(name):
     if success:
         return Response(body, status=200, content_type='text/css')
     else:
-        return Response('<pre>%s</pre>', status=500, content_type='text/html')
+        return Response('<pre>%s</pre>' % body, status=500, content_type='text/html')
 
